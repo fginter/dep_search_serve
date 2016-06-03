@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+ <html lang="en">
+ 
+ <head>
+     <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <meta name="description" content="">
+     <meta name="author" content="">
+ 
+     <title>TurkuNLP dep_search</title>
+
+     <script type="text/javascript">
+       $APP_ROOT= {{request.script_root|tojson|safe }};
+     </script>
+ 
+     <!-- Bootstrap core CSS -->
+     <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+     <link href="{{ url_for('static', filename='css/jquery-ui.css') }}" rel="stylesheet">
+     <!-- Custom styles for this template -->
+     <link href="{{ url_for('static', filename='css/turkunlp.css') }}" rel="stylesheet">
+     <script src="{{ url_for('static', filename='js/jquery-1.9.0.js') }}"> </script>
+     <script src="{{ url_for('static', filename='js/dsearch.js') }}"> </script>
+     <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
+  </head>
+ 
+ <body>
+   <div class="container">
+     <a href="http://bionlp.utu.fi/">[Turku NLP Group]</a>
+     <form class="form-inline" id="inpform" role="form">
+         <input type="text" class="form-control autocomplete" id="query" name="query" placeholder="Type in your query" autocorrect="off" autocapitalize="none"/>
+	 <button id="submitquery" type="submit" class="btn btn-default btn-primary active form-control" role="button">Search</button>
+	 <div class="form-group">
+	   <label>Case sensitive:</label>
+	   <div class="checkbox">
+	     <input type="checkbox" class="form-control" value="case-sensitive" id="case" name="case" checked />
+	   </div>
+	 </div>
+	 <div class="form-group">
+	   <label for="topn">Hits per page</label>
+	   <select class="form-control" id="hits_per_page" name="hits_per_page">
+	     <option>10</option>
+	     <option selected>50</option>
+	     <option>250</option>
+	     <option>1000</option>
+	   </select>
+	 </div>
+     </form>
+
+     <div id="queryresult" class="row" ></div>
+ </body>
+ </html>
