@@ -9,6 +9,7 @@ function ahook(frm,resdiv,path) {
 	    success: function(response){
 		var respdata=jQuery.parseJSON(response)
 		$(resdiv).html(respdata.ret);
+		Annodoc.activate();//.createEmbeddedVisualizationss();
 	    },
 	    error: function(error){
 		console.log(error);
