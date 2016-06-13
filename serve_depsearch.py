@@ -3,6 +3,7 @@ import flask
 import json
 import requests
 
+DEBUGMODE=True
 try:
     from config_local import * #use to override the constants above if you like
 except ImportError:
