@@ -10,7 +10,8 @@ function ahook(frm,resdiv,path) {
 		var respdata=jQuery.parseJSON(response)
 		$(resdiv).html(respdata.ret);
 		$('.conllu').each(function() {
-		    Annodoc.embedAnnotation($(this));
+		    Annodoc.embedAnnotation($(this), Annodoc.parseConllU,
+					    Config.bratCollData);
 		});
 	    },
 	    error: function(error){
