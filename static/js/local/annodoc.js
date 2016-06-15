@@ -1115,7 +1115,7 @@ var Annodoc = (function($, window, undefined) {
 
     var embedAnnotation = function(elem, parse, cdata, data, options) {
         // argument defaults
-        parse = (parse !== undefined) ? parse : parseAnn;
+        parse = (parse !== undefined) ? parse : parseConllU;
         cdata = (cdata !== undefined) ? cdata : {};
         data = embeddingData(elem, data);
         options = embeddingOptions(elem, options);
@@ -1583,6 +1583,7 @@ var Annodoc = (function($, window, undefined) {
     };
 
     return {
+        embedAnnotation: embedAnnotation,
         activate: activate,
     };
 })(jQuery, window);
