@@ -26,9 +26,13 @@ def index():
 @app.route('/query',methods=["POST"])
 def query():
     query=flask.request.form['query'].strip()
-    hits_per_page=3#int(flask.request.form['hits_per_page'])
+    hits_per_page=int(flask.request.form['hits_per_page'])
+    if flask.request.form.get('case'):
+        case_sensitive=True
+    else:
+        case_sensitive=False
     
-    r=requests.get("http://bionlp-www.utu.fi/dep_search_api",params={"db":"Finnish", "search":query, "retmax":hits_per_page},stream=True)
+    r=requests.get(DEP_SEARCH_WEBAPI,params={"db":"Suomi24", "case":case_sensitive, "search":query, "retmax":hits_per_page},stream=True)
     ret=flask.render_template("result_tbl.html",trees=yield_trees(l.decode("utf-8") for l in r.iter_lines()))
     return json.dumps({'ret':ret});
 
