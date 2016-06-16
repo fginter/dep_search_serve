@@ -16,16 +16,17 @@
      <!-- Bootstrap core CSS -->
      <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
      <link href="{{ url_for('static', filename='css/jquery-ui.css') }}" rel="stylesheet">
+     <link href="{{ url_for('static', filename='css/turkunlp.css') }}" rel="stylesheet">
 
      <!-- Custom styles for this template -->
-     <link href="{{ url_for('static', filename='css/turkunlp.css') }}" rel="stylesheet">
-     <script src="{{ url_for('static', filename='js/jquery-1.9.0.js') }}"> </script>
+     <script src="{{ url_for('static', filename='js/jquery.min.js') }}"> </script>
+     <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"> </script>
      <script src="{{ url_for('static', filename='js/dsearch.js') }}"> </script>
      <script src="{{ url_for('static', filename='js/jquery-ui.js') }}"></script>
 
      
 	<!-- annotation visualization stuff --> 
-	<link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui-redmond.css') }}"/>
+	<!-- <link rel="stylesheet" href="{{ url_for('static', filename='css/jquery-ui-redmond.css') }}"/> -->
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/annodoc-main.css') }}"/>
 	<link rel="stylesheet" href="{{ url_for('static', filename='css/style-vis.css') }}"/>
 	<!-- <link rel="stylesheet" href="http://bionlp-www.utu.fi/dep_search//css/depsearch.css"> -->
@@ -61,7 +62,7 @@
 
 <!-- annotation visualization stuff --> 
 <script type="text/javascript">
-    var root = "{{ url_for('static' , filename='') }}";
+    var root = "{{url_for('static' , filename='')}}";
     head.js(
         // External libraries
         root + 'js/jquery.min.js',
