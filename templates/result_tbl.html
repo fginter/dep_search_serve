@@ -1,7 +1,9 @@
-{% for tree in trees %}
-<a data-target="#tree_{{loop.index}}" class="btn btn-default" data-toggle="collapse"> Show metadata {{loop.index}}</a>
+{% for tree,comment in trees %}
+<a data-target="#tree_{{loop.index}}" data-toggle="collapse"> [details]</a>
 <div class="collapse" id="tree_{{loop.index}}">
-    This div (Foo) is hidden by default
+  {% for c_line in comment %}
+  {{c_line}}<br/>
+  {% endfor %}
 </div>
 <pre>
 <code class="conllu">
