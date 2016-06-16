@@ -39,7 +39,14 @@
    <div class="container">
      <a href="http://bionlp.utu.fi/">[Turku NLP Group]</a>
      <form class="form-inline" id="inpform" role="form">
-         <input type="text" class="form-control autocomplete" id="query" name="query" placeholder="Type in your query" autocorrect="off" autocapitalize="none"/>
+       <div class="form-group">
+	 <select class="form-control" id="treeset" name="treeset">
+	   {% for treeset in treesets %}
+	   <option>{{treeset}}</option>
+	   {% endfor %}
+	 </select>
+       </div>
+       <input type="text" class="form-control autocomplete" id="query" name="query" placeholder="Type in your query" autocorrect="off" autocapitalize="none"/>
 	 <button id="submitquery" type="submit" class="btn btn-default btn-primary active form-control" role="button">Search</button>
 	 <div class="form-group">
 	   <label>Case sensitive:</label>

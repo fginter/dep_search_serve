@@ -21,18 +21,21 @@ def yield_trees(src):
 
 @app.route("/")
 def index():
-    return flask.render_template("index_template.html")
+    r=requests.get(DEP_SEARCH_WEBAPI+"/metadata") #Ask about the available corpora
+    metadata=json.loads(r.text)
+    return flask.render_template("index_template.html",treesets=metadata["corpus_list"])
 
 @app.route('/query',methods=["POST"])
 def query():
     query=flask.request.form['query'].strip()
     hits_per_page=int(flask.request.form['hits_per_page'])
+    treeset=flask.request.form['treeset'].strip()
     if flask.request.form.get('case'):
         case_sensitive=True
     else:
         case_sensitive=False
     
-    r=requests.get(DEP_SEARCH_WEBAPI,params={"db":"Suomi24", "case":case_sensitive, "search":query, "retmax":hits_per_page},stream=True)
+    r=requests.get(DEP_SEARCH_WEBAPI,params={"db":treeset, "case":case_sensitive, "search":query, "retmax":hits_per_page},stream=True)
     ret=flask.render_template("result_tbl.html",trees=yield_trees(l.decode("utf-8") for l in r.iter_lines()))
     return json.dumps({'ret':ret});
 
