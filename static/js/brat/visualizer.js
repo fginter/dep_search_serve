@@ -295,11 +295,7 @@ var Visualizer = (function($, window, undefined) {
       });
     };
 
-    var Visualizer = function(dispatcher, svgId, webFontURLs,
-                              visualizerOptions) {
-      if (visualizerOptions === undefined) {
-          visualizerOptions = {};
-      }
+    var Visualizer = function(dispatcher, svgId, webFontURLs) {
       var $svgDiv = $('#' + svgId);
       if (!$svgDiv.length) {
         throw Error('Could not find container with id="' + svgId + '"');
@@ -323,7 +319,7 @@ var Visualizer = (function($, window, undefined) {
       var minArcSlant = 8;
       var arcHorizontalSpacing = 10; // min space boxes with connecting arc
       var rowSpacing = -5;          // for some funny reason approx. -10 gives "tight" packing.
-      var sentNumMargin = 20;
+      var sentNumMargin = 31;
       var smoothArcCurves = true;   // whether to use curves (vs lines) in arcs
       var smoothArcSteepness = 0.5; // steepness of smooth curves (control point)
       var reverseArcControlx = 5;   // control point distance for "UFO catchers"
@@ -357,12 +353,6 @@ var Visualizer = (function($, window, undefined) {
       var fragmentConnectorDashArray = '1,3,3,3';
       var fragmentConnectorColor = '#000000';
 
-      // set caller options
-      if (visualizerOptions.sentNumMargin !== undefined) {
-          sentNumMargin = visualizerOptions.sentNumMargin;
-          // TODO: more, ideally allow any option above to be set
-      }
-
       // END OPTIONS
 
 
@@ -389,13 +379,6 @@ var Visualizer = (function($, window, undefined) {
         'AddedAnnotation', 'MissingAnnotation', 'ChangedAnnotation'];
 
       this.arcDragOrigin = null; // TODO
-
-      // due to silly Chrome bug, I have to make it pay attention
-      var forceRedraw = function() {
-        if (!$.browser.chrome) return; // not needed
-        $svg.css('margin-bottom', 1);
-        setTimeout(function() { $svg.css('margin-bottom', 0); }, 0);
-      }
 
       var rowBBox = function(span) {
         var box = $.extend({}, span.rectBox); // clone
@@ -665,7 +648,7 @@ var Visualizer = (function($, window, undefined) {
           // instead of using the first attribute def found
           var attrType = (eventAttributeTypes[attr[1]] ||
                           entityAttributeTypes[attr[1]]);
-          var attrValue = attrType && attrType.values[attrType.bool || attr[3]];
+          var attrValue = attrType && attrType.values.byName[attrType.bool || attr[3]];
           var span = data.spans[attr[2]];
           if (!span) {
             dispatcher.post('messages', [[['Annotation ' + attr[2] + ', referenced from attribute ' + attr[0] + ', does not exist.', 'error']]]);
@@ -674,7 +657,7 @@ var Visualizer = (function($, window, undefined) {
           var valText = (attrValue && attrValue.name) || attr[3];
           var attrText = attrType
             ? (attrType.bool ? attrType.name : (attrType.name + ': ' + valText))
-            : (attr[3] === true ? attr[1] : attr[1] + ': ' + attr[3]);
+            : (attr[3] == true ? attr[1] : attr[1] + ': ' + attr[3]);
           span.attributeText.push(attrText);
           span.attributes[attr[1]] = attr[3];
           if (attr[4]) { // cue
@@ -1035,7 +1018,7 @@ var Visualizer = (function($, window, undefined) {
                 warning = true;
                 return;
               }
-              var val = attr.values[attr.bool || valType];
+              var val = attr.values.byName[attr.bool || valType];
               if (!val) {
                 // non-existent value
                 warning = true;
@@ -1353,40 +1336,6 @@ var Visualizer = (function($, window, undefined) {
         return arrowId;
       }
 
-      var createStyleMap = function(styles) {
-          var styleMap = {};
-          
-          if (!styles) {
-              return styleMap;
-          }
-          for (var i=0; i<styles.length; i++) {
-              var style = styles[i];
-
-              if (!style || style.length !== 3) {
-                  console.log('warning: invalid style spec:', style);
-                  continue;
-              }
-
-              var targetRef = style[0],
-                  attribute = style[1],
-                  value = style[2];
-
-              // map multipart IDs to reference string by joining w/space
-              if (targetRef instanceof Array) {
-                  targetRef = targetRef.join(' ');
-              }
-
-              if (styleMap[targetRef] === undefined) {
-                  styleMap[targetRef] = {};
-              }
-              if (styleMap[targetRef][attribute] !== undefined) {
-                  console.log('warning: multiple style definitions for',
-                              targetRef, attribute);
-              }
-              styleMap[targetRef][attribute] = value;
-          }
-          return styleMap;
-      };
 
       var drawing = false;
       var redraw = false;
@@ -1431,8 +1380,6 @@ Util.profileStart('measures');
 
         var sizes = getTextAndSpanTextMeasurements();
         data.sizes = sizes;
-
-        var styleMap = createStyleMap(sourceData['styles']);
 
         adjustTowerAnnotationSizes();
         var maxTextWidth = 0;
@@ -1631,19 +1578,6 @@ Util.profileStart('chunks');
             var borderColor = ((spanDesc && spanDesc.borderColor) ||
                                (spanTypes.SPAN_DEFAULT &&
                                 spanTypes.SPAN_DEFAULT.borderColor) || '#000000');
-
-            // set span-specific styles
-            if (styleMap[span.id]) {
-                if (styleMap[span.id]['fgColor'] !== undefined) {
-                    fgColor = styleMap[span.id]['fgColor'];
-                }
-                if (styleMap[span.id]['bgColor'] !== undefined) {
-                    bgColor = styleMap[span.id]['bgColor'];
-                }
-                if (styleMap[span.id]['borderColor'] !== undefined) {
-                    borderColor = styleMap[span.id]['borderColor'];
-                }
-            }
 
             // special case: if the border 'color' value is 'darken',
             // then just darken the BG color a bit for the border.
@@ -1989,9 +1923,8 @@ Util.profileStart('chunks');
             // if we added a gap, center the intervening elements
             spacing /= 2;
             var firstChunkInRow = row.chunks[row.chunks.length - 1];
-            if (firstChunkInRow === undefined) {
-              console.log('warning: firstChunkInRow undefined, chunk:', chunk);
-            } else { // valid firstChunkInRow
+            // are there already some intervening chunks to move?
+            if (firstChunkInRow) {
               if (spacingChunkId < firstChunkInRow.index) {
                 spacingChunkId = firstChunkInRow.index + 1;
               }
@@ -2184,33 +2117,10 @@ Util.profileStart('arcs');
           var dashArray = arcDesc && arcDesc.dashArray;
           var arrowHead = ((arcDesc && arcDesc.arrowHead) ||
                            (spanTypes.ARC_DEFAULT && spanTypes.ARC_DEFAULT.arrowHead) ||
-                           'triangle,5');
+                           'triangle,5') + ',' + color;
           var labelArrowHead = ((arcDesc && arcDesc.labelArrow) ||
                                 (spanTypes.ARC_DEFAULT && spanTypes.ARC_DEFAULT.labelArrow) ||
-                                'triangle,5');
-
-          // set arc-specific styles
-          var arcRef = [arc.origin, arc.target, arc.type].join(' ');
-          if (styleMap[arcRef]) {
-              if (styleMap[arcRef]['color'] !== undefined) {
-                  color = styleMap[arcRef]['color'];
-              }
-              if (styleMap[arcRef]['symmetric'] !== undefined) {
-                  symmetric = styleMap[arcRef]['symmetric'];
-              }
-              if (styleMap[arcRef]['dashArray'] !== undefined) {
-                  dashArray = styleMap[arcRef]['dashArray'];
-              }
-              if (styleMap[arcRef]['arrowHead'] !== undefined) {
-                  arrowHead = styleMap[arcRef]['arrowHead'];
-              }
-              if (styleMap[arcRef]['labelArrow'] !== undefined) {
-                  labelArrowHead = styleMap[arcRef]['labelArrow'];
-              }
-          }
-
-          arrowHead +=  ',' + color;
-          labelArrowHead += ',' + color;
+                                'triangle,5') + ',' + color;
 
           var leftBox = rowBBox(left);
           var rightBox = rowBBox(right);
@@ -2434,8 +2344,7 @@ Util.profileStart('arcs');
               }
               if (height > row.maxArcHeight) row.maxArcHeight = height;
 
-              var myArrowHead   = ((styleMap[arcRef] && styleMap[arcRef]['arrowHead']) ||
-                                   (arcDesc && arcDesc.arrowHead) ||
+              var myArrowHead   = ((arcDesc && arcDesc.arrowHead) ||
                                    (spanTypes.ARC_DEFAULT && spanTypes.ARC_DEFAULT.arrowHead));
               var arrowName = (symmetric ? myArrowHead || 'none' :
                     (leftToRight ? 'none' : myArrowHead || 'triangle,5')
@@ -2445,8 +2354,7 @@ Util.profileStart('arcs');
 
               var arrowAtLabelAdjust = 0;
               var labelArrowDecl = null;
-              var myLabelArrowHead = ((styleMap[arcRef] && styleMap[arcRef]['labelArrow']) ||
-                                      (arcDesc && arcDesc.labelArrow) ||
+              var myLabelArrowHead = ((arcDesc && arcDesc.labelArrow) ||
                                       (spanTypes.ARC_DEFAULT && spanTypes.ARC_DEFAULT.labelArrow));
               if (myLabelArrowHead) {
                 var labelArrowName = (leftToRight ?
@@ -2915,6 +2823,7 @@ Util.profileStart('finish');
 
         $svg.width(canvasWidth);
         $svg.height(y);
+        $svg.attr("viewBox", "0 0 " + canvasWidth + " " + y);
         $svgDiv.height(y);
 
 Util.profileEnd('finish');
@@ -3101,7 +3010,6 @@ Util.profileStart('before render');
                 parent().
                 addClass('highlight');
           }
-          forceRedraw();
         } else if (!that.arcDragOrigin && (id = target.attr('data-arc-role'))) {
           var originSpanId = target.attr('data-arc-origin');
           var targetSpanId = target.attr('data-arc-target');
@@ -3169,7 +3077,6 @@ Util.profileStart('before render');
           highlightSpans.removeClass('highlight');
           highlightSpans = undefined;
         }
-        forceRedraw();
       };
 
       var setAbbrevs = function(_abbrevsOn) {
@@ -3296,15 +3203,16 @@ Util.profileStart('before render');
         $.each(response_types, function(aTypeNo, aType) {
           processed[aType.type] = aType;
           // count the values; if only one, it's a boolean attribute
-          var values = [];
-          for (var i in aType.values) {
-            if (aType.values.hasOwnProperty(i)) {
-              values.push(i);
-            }
+          if (aType.values.length == 1) {
+            aType.bool = aType.values[0].name;
           }
-          if (values.length == 1) {
-            aType.bool = values[0];
-          }
+          // We need attribute values to be stored as an array, in the correct order,
+          // but for efficiency of access later we also create a map of each value 
+          // name to the corresponding value dictionary.
+          aType.values.byName = {}
+          $.each(aType.values, function(valueNo, val) {
+              aType.values.byName[val.name] = val;
+          });
         });
         return processed;
       }
