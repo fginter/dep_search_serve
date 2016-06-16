@@ -1583,6 +1583,8 @@ var Annodoc = (function($, window, undefined) {
     };
 
     return {
+        embedAnnotation: embedAnnotation,
+        parseConllU: parseConllU,
         activate: activate,
     };
 })(jQuery, window);
