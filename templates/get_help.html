@@ -1,0 +1,22 @@
+<html>
+  <body>
+    <h1>/query</h1>
+    <p>This is an interface allowing direct links to the dep_search web user interface.</p>
+    <ul>
+      <li> <b>db</b> : a tree database to query (see the currently available list below). Compulsory parameter.</li>
+      <li> <b>search</b> : the query to run</li>
+      <li> <b>case</b> : case-sensitive "true" or "false"</li>
+      <li> <b>max_hits</b> : how many hits to show? 10, 50, 100, 250 are possible values</li>
+    </ul>
+
+    <p>Available tree databases</p>
+    <ul>
+    {% for tset in treesets %}
+    <li>{{tset}}</li>
+    {% endfor %}
+    </ul>
+    
+  </body>
+
+  
+</html>
