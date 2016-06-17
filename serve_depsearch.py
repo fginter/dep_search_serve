@@ -61,6 +61,8 @@ def query2():
     r=requests.get(DEP_SEARCH_WEBAPI+"/metadata") #Ask about the available corpora
     metadata=json.loads(r.text)
 
+    if "db" not in flask.request.args or "search" not in flask.request.args:
+        return flask.render_template("get_help.html",treesets=metadata["corpus_list"])
     corpus=flask.request.args["db"]
     query=flask.request.args["search"]
     case_sensitive="checked"
