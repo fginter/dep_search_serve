@@ -5,12 +5,19 @@ function dsearch_ajax_response(json_data,resdiv) {
 	Annodoc.embedAnnotation($(this), Annodoc.parseConllU,
 				Config.bratCollData);
     });
+    $('#querylink').prop('href',respdata.query_link);
+    $('#downloadlink').prop('href',respdata.download_link);
 }
 
 function dsearch_simulate_form(corpus,query,case_sensitive,hits_per_page) {
     $('#query').val(query);
     $('#treeset').val(corpus);
-    $('#case').val(case_sensitive);
+    if (case_sensitive=="true" || case_sensitive=="True" || case_sensitive=="checked") {
+	$('#case').prop("checked",true);
+    }
+    else {
+	$('#case').prop("checked",false);
+    }
     $('#hits_per_page').val(hits_per_page);
     dsearch_run_ajax('#inpform','/query','#queryresult');
     window.history.pushState("string", "", "/");
