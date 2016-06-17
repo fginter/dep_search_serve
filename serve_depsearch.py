@@ -25,6 +25,8 @@ def yield_trees(src):
             current_context+=(' <b>{sent}</b>'.format(sent=flask.escape(line.split(":",1)[1].strip())))
         elif line.startswith("# context"):
             current_context+=(' {sent}'.format(sent=flask.escape(line.split(":",1)[1].strip())))
+        elif line.startswith("# hittoken"):
+            current_tree.append(line)
         elif not line.startswith("#"):
             current_tree.append(line)
         if line=="":
