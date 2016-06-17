@@ -2,6 +2,7 @@ from flask import Flask, Markup
 import flask
 import json
 import requests
+import urllib
 
 DEBUGMODE=True
 try:
@@ -59,10 +60,10 @@ class Query:
         self.treeset,self.query,self.case_sensitive,self.hits_per_page=treeset,query,case_sensitive,hits_per_page
 
     def query_link(self,url=""):
-        return url+"query?search={query}&db={treeset}&case_sensitive={case_sensitive}&hits_per_page={hits_per_page}".format(query=flask.escape(self.query),treeset=self.treeset,case_sensitive=self.case_sensitive,hits_per_page=self.hits_per_page)
+        return url+"query?search={query}&db={treeset}&case_sensitive={case_sensitive}&hits_per_page={hits_per_page}".format(query=urllib.parse.quote(self.query),treeset=self.treeset,case_sensitive=self.case_sensitive,hits_per_page=self.hits_per_page)
 
     def download_link(self,url=""):
-        return DEP_SEARCH_WEBAPI+"?search={query}&db={treeset}&case={case_sensitive}&retmax=5000&dl".format(query=flask.escape(self.query),treeset=self.treeset,case_sensitive=self.case_sensitive)
+        return DEP_SEARCH_WEBAPI+"?search={query}&db={treeset}&case={case_sensitive}&retmax=5000&dl".format(query=urllib.parse.quote(self.query),treeset=self.treeset,case_sensitive=self.case_sensitive)
         
 @app.route("/")
 def index():
@@ -89,7 +90,7 @@ def query_get():
         return flask.render_template("get_help.html",treesets=metadata["corpus_list"])
 
     q=Query.from_get_request(flask.request.args)
-    run_request=Markup('dsearch_simulate_form("{treeset}","{query}","{case_sensitive}","{max_hits}");'.format(treeset=q.treeset,query=q.query,case_sensitive=q.case_sensitive,max_hits=q.hits_per_page))
+    run_request=Markup('dsearch_simulate_form("{treeset}","{query}","{case_sensitive}","{max_hits}");'.format(treeset=q.treeset,query=q.query.replace('"',r'\"'),case_sensitive=q.case_sensitive,max_hits=q.hits_per_page))
     return flask.render_template("index_template.html",treesets=metadata["corpus_list"],run_request=run_request)
     
 
