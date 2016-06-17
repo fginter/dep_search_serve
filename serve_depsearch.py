@@ -9,7 +9,7 @@ try:
 except ImportError:
     pass #no config_local
 
-app = Flask("dep_search_webapp")
+app = Flask("dep_search_webgui")
 
 def yield_trees(src):
     current_tree=[]
@@ -39,6 +39,7 @@ def index():
     metadata=json.loads(r.text)
     return flask.render_template("index_template.html",treesets=metadata["corpus_list"])
 
+#This is what JS+AJAX call
 @app.route('/query',methods=["POST"])
 def query():
     query=flask.request.form['query'].strip()
@@ -53,5 +54,24 @@ def query():
     ret=flask.render_template("result_tbl.html",trees=yield_trees(l.decode("utf-8") for l in r.iter_lines()))
     return json.dumps({'ret':ret});
 
+#This is what GET calls
+#We return the index and prefill a script call to launch the form for us
+@app.route('/query',methods=["GET"])
+def query2():
+    r=requests.get(DEP_SEARCH_WEBAPI+"/metadata") #Ask about the available corpora
+    metadata=json.loads(r.text)
+
+    corpus=flask.request.args["db"]
+    query=flask.request.args["search"]
+    case_sensitive="checked"
+    max_hits="10"
+    run_request=Markup('dsearch_simulate_form("{corpus}","{query}","{case_sensitive}","{max_hits}");'.format(corpus=corpus,query=query,case_sensitive=case_sensitive,max_hits=max_hits))
+    return flask.render_template("index_template.html",treesets=metadata["corpus_list"],run_request=run_request)
+    
+
+
 if __name__ == '__main__':
     app.run(debug=DEBUGMODE)
+    r=requests.get(DEP_SEARCH_WEBAPI+"/metadata") #Ask about the available corpora
+    metadata=json.loads(r.text)
+

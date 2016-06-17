@@ -111,5 +111,11 @@
 </script>
 <!-- end annotation visualization stuff -->
 
+{% if run_request is defined %}
+<script type="text/javascript">
+  {{run_request}};
+</script>
+{% endif %}
+
  </body>
  </html>
