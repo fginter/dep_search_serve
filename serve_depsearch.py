@@ -80,6 +80,8 @@ def query_post():
     r=requests.get(DEP_SEARCH_WEBAPI,params={"db":q.treeset, "case":q.case_sensitive, "context":3, "search":q.query, "retmax":q.hits_per_page})
     if r.text.startswith("# Error in query"):
         ret = flask.render_template("query_error.html", err=r.text)
+    elif not r.text.strip():
+        ret = flask.render_template("empty_result.html")
     else:
         ret=flask.render_template("result_tbl.html",trees=yield_trees(r.text.splitlines()))
     return json.dumps({'ret':ret,'query_link':q.query_link(),'download_link':q.download_link()});
