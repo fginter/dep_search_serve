@@ -66,6 +66,9 @@
 	 </div>
      </form>
      <a href="" id="querylink">[Link to this query]</a> <a href="" id="downloadlink">[Download data]</a> <a href="http://bionlp.utu.fi/searchexpressions-new.html">[Query Language]</a>
+     <div id="loading" style="display:none">
+       <p><img src="{{url_for('static' , filename='wait.gif')}}" /> </p>
+     </div>
      <div id="queryresult" class="row" ></div>
 
 <!-- annotation visualization stuff --> 

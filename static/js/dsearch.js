@@ -25,15 +25,17 @@ function dsearch_simulate_form(corpus,query,case_sensitive,hits_per_page) {
 
 function dsearch_run_ajax(frm,path,resdiv) {
     $.ajax({
-	    url: $APP_ROOT+path,
-	    data: $(frm).serialize(),
-	    type: 'POST',
-	    success: function(response){
-		dsearch_ajax_response(response,resdiv);
-	    },
-	    error: function(error){
-		console.log(error);
-	    }
+	url: $APP_ROOT+path,
+	data: $(frm).serialize(),
+	type: 'POST',
+	beforeSend: function() { $(resdiv).hide(); $('#loading').show(); },
+	complete: function() { $('#loading').hide(); $(resdiv).show(); },
+	success: function(response){
+	    dsearch_ajax_response(response,resdiv);
+	},
+	error: function(error){
+	    console.log(error);
+	}
     });
 }
 
