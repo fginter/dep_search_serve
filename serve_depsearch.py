@@ -73,7 +73,7 @@ class Query:
 def index():
     r=requests.get(DEP_SEARCH_WEBAPI+"/metadata") #Ask about the available corpora
     metadata=json.loads(r.text)
-    return flask.render_template("index_template.html",treesets=metadata["corpus_list"])
+    return flask.render_template("index_template.html",corpus_groups=metadata["corpus_groups"])
 
 #This is what JS+AJAX call
 @app.route('/query',methods=["POST"])

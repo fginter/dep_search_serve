@@ -41,8 +41,10 @@
      <form class="form-inline" id="inpform" role="form">
        <div class="form-group">
 	 <select class="form-control" id="treeset" name="treeset">
-	   {% for treeset in treesets %}
-	   <option>{{treeset}}</option>
+	   {% for cgroup in corpus_groups %}
+	     {% for cid, cname in cgroup.corpora %}
+	   <option>{{cname}}</option>
+	     {% endfor %}
 	   {% endfor %}
 	 </select>
        </div>
