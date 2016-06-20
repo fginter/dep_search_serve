@@ -77,8 +77,11 @@ def index():
 @app.route('/query',methods=["POST"])
 def query_post():
     q=Query.from_formdata(flask.request.form)
-    r=requests.get(DEP_SEARCH_WEBAPI,params={"db":q.treeset, "case":q.case_sensitive, "context":3, "search":q.query, "retmax":q.hits_per_page},stream=True)
-    ret=flask.render_template("result_tbl.html",trees=yield_trees(l.decode("utf-8") for l in r.iter_lines()))
+    r=requests.get(DEP_SEARCH_WEBAPI,params={"db":q.treeset, "case":q.case_sensitive, "context":3, "search":q.query, "retmax":q.hits_per_page})
+    if r.text.startswith("# Error in query"):
+        ret = flask.render_template("query_error.html", err=r.text)
+    else:
+        ret=flask.render_template("result_tbl.html",trees=yield_trees(r.text.splitlines()))
     return json.dumps({'ret':ret,'query_link':q.query_link(),'download_link':q.download_link()});
 
 #This is what GET calls
