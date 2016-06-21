@@ -9,13 +9,16 @@
       <li> <b>max_hits</b> : how many hits to show? 10, 50, 100, 250 are possible values</li>
     </ul>
 
-    <p>Available tree databases</p>
-    <ul>
-    {% for tset in treesets %}
-    <li>{{tset}}</li>
+    <h1>Available tree databases</h1>
+    {% for cgroup in corpus_groups %}
+    <h2>{{cgroup.name}}</h2>
+    <table>
+      <tr><th>tree database id</th><th>name</th></tr>
+      {% for cid, cname in cgroup.corpora %}
+      <tr><td><b>{{cid}}</b></td><td>{{cname}}</td></tr>
+      {% endfor %}
+    </table>
     {% endfor %}
-    </ul>
-    
   </body>
 
   

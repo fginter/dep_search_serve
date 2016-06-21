@@ -96,11 +96,11 @@ def query_get():
     metadata=json.loads(r.text)
 
     if "db" not in flask.request.args or "search" not in flask.request.args:
-        return flask.render_template("get_help.html",treesets=metadata["corpus_list"])
+        return flask.render_template("get_help.html",corpus_groups=metadata["corpus_groups"])
 
     q=Query.from_get_request(flask.request.args)
     run_request=Markup('dsearch_simulate_form("{treeset}","{query}","{case_sensitive}","{max_hits}");'.format(treeset=q.treeset,query=q.query.replace('"',r'\"'),case_sensitive=q.case_sensitive,max_hits=q.hits_per_page))
-    return flask.render_template("index_template.html",treesets=metadata["corpus_list"],run_request=run_request)
+    return flask.render_template("index_template.html",corpus_groups=metadata["corpus_groups"],run_request=run_request)
     
 
 

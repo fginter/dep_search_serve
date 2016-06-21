@@ -40,11 +40,16 @@
      <a href="http://bionlp.utu.fi/">[Turku NLP Group]</a>
      <form class="form-inline" id="inpform" role="form">
        <div class="form-group">
+
+
+	 
 	 <select class="form-control" id="treeset" name="treeset">
 	   {% for cgroup in corpus_groups %}
-	     {% for cid, cname in cgroup.corpora %}
-	   <option>{{cname}}</option>
-	     {% endfor %}
+	   <optgroup label="{{cgroup.name}}">
+	   {% for cid, cname in cgroup.corpora %}
+	   <option value="{{cid}}">{{cname}}</option>
+	   {% endfor %}
+	   </optgroup>
 	   {% endfor %}
 	 </select>
        </div>
