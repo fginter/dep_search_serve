@@ -20,7 +20,7 @@ function dsearch_simulate_form(corpus,query,case_sensitive,hits_per_page) {
     }
     $('#hits_per_page').val(hits_per_page);
     dsearch_run_ajax('#inpform','/query','#queryresult');
-    window.history.pushState("string", "", "/");
+    //window.history.pushState("string", "", "/");
 }
 
 function dsearch_run_ajax(frm,path,resdiv) {
@@ -34,8 +34,15 @@ function dsearch_run_ajax(frm,path,resdiv) {
 	    dsearch_ajax_response(response,resdiv);
 	},
 	error: function(error){
+	    console.log("error, maybe timeout");
 	    console.log(error);
-	}
+	},
+	fail: function(error){
+	    console.log("fail, maybe timeout");
+	    console.log(error);
+	},
+	timeout:600000
+
     });
 }
 
