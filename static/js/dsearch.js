@@ -28,16 +28,18 @@ function dsearch_run_ajax(frm,path,resdiv) {
 	url: $APP_ROOT+path,
 	data: $(frm).serialize(),
 	type: 'POST',
-	beforeSend: function() { $(resdiv).hide(); $('#loading').show(); },
+	beforeSend: function() { $(resdiv).html('');$(resdiv).hide(); $('#loading').show(); },
 	complete: function() { $('#loading').hide(); $(resdiv).show(); },
 	success: function(response){
 	    dsearch_ajax_response(response,resdiv);
 	},
 	error: function(error){
+	    $(resdiv).html('Backend server timeout.');
 	    console.log("error, maybe timeout");
 	    console.log(error);
 	},
 	fail: function(error){
+	    $(resdiv).html('Backend server timeout.');
 	    console.log("fail, maybe timeout");
 	    console.log(error);
 	},
