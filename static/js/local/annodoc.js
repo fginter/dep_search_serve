@@ -1586,5 +1586,6 @@ var Annodoc = (function($, window, undefined) {
     return {
         activate: activate,
         embedAnnotation: embedAnnotation,
+        parseConllU: parseConllU,        
     };
 })(jQuery, window);
