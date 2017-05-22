@@ -7,6 +7,7 @@ function dsearch_ajax_response(json_data,resdiv) {
     });
     $('#querylink').prop('href',respdata.query_link);
     $('#downloadlink').prop('href',respdata.download_link);
+    $('#sourcelinks').html(respdata.source_links);
 }
 
 function dsearch_simulate_form(corpus,query,case_sensitive,hits_per_page) {

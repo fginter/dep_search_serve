@@ -67,11 +67,13 @@ class Query:
     def __init__(self,treeset,query,case_sensitive,hits_per_page):
         self.treeset,self.query,self.case_sensitive,self.hits_per_page=treeset,query,case_sensitive,hits_per_page
 
-    def query_link(self,url=u""):
+    def query_link(self,url=u"",treeset=None):
+        if treeset is None:
+            treeset=self.treeset
         if six.PY2:
-            return url+u"query?search={query}&db={treeset}&case_sensitive={case_sensitive}&hits_per_page={hits_per_page}".format(query=unicode(urllib.parse.quote(self.query.encode("utf-8")),"utf-8"),treeset=self.treeset,case_sensitive=self.case_sensitive,hits_per_page=self.hits_per_page)
+            return url+u"query?search={query}&db={treeset}&case_sensitive={case_sensitive}&hits_per_page={hits_per_page}".format(query=unicode(urllib.parse.quote(self.query.encode("utf-8")),"utf-8"),treeset=treeset,case_sensitive=self.case_sensitive,hits_per_page=self.hits_per_page)
         else:
-            return url+u"query?search={query}&db={treeset}&case_sensitive={case_sensitive}&hits_per_page={hits_per_page}".format(query=urllib.parse.quote(self.query),treeset=self.treeset,case_sensitive=self.case_sensitive,hits_per_page=self.hits_per_page)
+            return url+u"query?search={query}&db={treeset}&case_sensitive={case_sensitive}&hits_per_page={hits_per_page}".format(query=urllib.parse.quote(self.query),treeset=treeset,case_sensitive=self.case_sensitive,hits_per_page=self.hits_per_page)
 
     def download_link(self,url=""):
         if six.PY2:
@@ -89,6 +91,7 @@ def index():
 @app.route(u'/query',methods=[u"POST"])
 def query_post():
     try:
+        sources=[]
         q=Query.from_formdata(flask.request.form)
         r=requests.get(DEP_SEARCH_WEBAPI,params={u"db":q.treeset, u"case":q.case_sensitive, u"context":3, u"search":q.query, u"retmax":q.hits_per_page})
         if r.text.startswith(u"# Error in query"):
@@ -96,9 +99,14 @@ def query_post():
         elif not r.text.strip():
             ret = flask.render_template(u"empty_result.html")
         else:
-            ret=flask.render_template(u"result_tbl.html",trees=yield_trees(r.text.splitlines()))
-
-        return json.dumps({u'ret':ret,u'query_link':q.query_link(),u'download_link':q.download_link()});
+            lines=r.text.splitlines()
+            if lines[0].startswith("# SourceStats : "):
+                sources=json.loads(lines[0].split(" : ",1)[1])
+                ret=flask.render_template(u"result_tbl.html",trees=yield_trees(lines[1:]))
+            else:
+                ret=flask.render_template(u"result_tbl.html",trees=yield_trees(lines))
+        links=['<a href="{link}">{src}</a>'.format(link=q.query_link(treeset=src),src=src) for src in sources]
+        return json.dumps({u'ret':ret,u'source_links':u' '.join(links),u'query_link':q.query_link(),u'download_link':q.download_link()});
     except:
         traceback.print_exc()
         
