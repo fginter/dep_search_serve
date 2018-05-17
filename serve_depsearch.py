@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 # This code can run in both Python 2.7+ and 3.3+
-
+import cgi
 from flask import Flask, Markup
 import flask
 import json
@@ -122,7 +122,7 @@ def query_get():
         return flask.render_template(u"get_help.html",corpus_groups=metadata[u"corpus_groups"])
 
     q=Query.from_get_request(flask.request.args)
-    run_request=Markup(u'dsearch_simulate_form("{treeset}","{query}","{case_sensitive}","{max_hits}");'.format(treeset=q.treeset,query=q.query.replace(u'"',u'\\"'),case_sensitive=q.case_sensitive,max_hits=q.hits_per_page))
+    run_request=Markup(u'dsearch_simulate_form("{treeset}",he.decode("{query}"),"{case_sensitive}","{max_hits}");'.format(treeset=cgi.escape(q.treeset),query=q.query.replace(u'"',u'\\"'),case_sensitive=cgi.escape(str(q.case_sensitive)),max_hits=cgi.escape(str(q.hits_per_page))))
     return flask.render_template(u"index_template.html",corpus_groups=metadata[u"corpus_groups"],run_request=run_request)
     
 
